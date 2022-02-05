@@ -1,48 +1,80 @@
 package com.example.a20_github
 
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.view.isGone
+import com.example.a20_github.data.database.DataBaseProvider
+import com.example.a20_github.data.entity.GithubRepoEntity
 import com.example.a20_github.databinding.ActivityMainBinding
+import com.example.a20_github.view.RepositoryRecyclerAdapter
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CoroutineScope {
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + Job()
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var adapter: RepositoryRecyclerAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initAdapter()
         initViews()
     }
 
-    private fun initViews() = with(binding){
-        loginButton.setOnClickListener {
-            loginGithub()
+    private fun initAdapter() {
+        adapter = RepositoryRecyclerAdapter()
+    }
+
+
+    private fun initViews() = with(binding) {
+        emptyResultTextView.isGone = true
+        recyclerView.adapter = adapter
+        searchButton.setOnClickListener {
+            startActivity(
+                Intent(this@MainActivity, SearchActivity::class.java)
+            )
         }
     }
 
-    private fun loginGithub() {
-        val loginUri = Uri.Builder().scheme("https").authority("github.com")
-            .appendPath("login")
-            .appendPath("oauth")
-            .appendPath("authorize")
-            .appendQueryParameter("client_id", BuildConfig.GITHUB_CLIENT_ID)
-            .build()
+    override fun onResume() {
+        super.onResume()
+        launch(coroutineContext) {
+            loadSearchHistory()
 
-        CustomTabsIntent.Builder().build().also {
-            it.launchUrl(this, loginUri)
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        intent?.data?.getQueryParameter("code")?.let {
-
+    private suspend fun loadSearchHistory()= withContext(Dispatchers.IO) {
+        val histories = DataBaseProvider.provideDB(this@MainActivity).searchHistoryDao().getHistory()
+        withContext(Dispatchers.Main){
+            setData(histories)
         }
+
+    }
+
+    private fun setData(githubRepoList: List<GithubRepoEntity>) = with(binding) {
+        if (githubRepoList.isEmpty()){
+            emptyResultTextView.isGone = false
+            recyclerView.isGone = true
+        } else {
+            emptyResultTextView.isGone = true
+            recyclerView.isGone = false
+            adapter.setSearchResultList(githubRepoList){
+                startActivity(
+                    Intent(this@MainActivity, RepositoryActivity::class.java).apply {
+                        putExtra(RepositoryActivity.REPOSITORY_OWNER_KEY, it.owner.login)
+                        putExtra(RepositoryActivity.REPOSITORY_NAME_KEY, it.name)
+                    }
+                )
+            }
+        }
+
     }
 }

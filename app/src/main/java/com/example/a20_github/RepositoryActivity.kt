@@ -57,7 +57,7 @@ class RepositoryActivity: AppCompatActivity(), CoroutineScope {
         showLoading(true)
     }
 
-    private fun loadRepository(repositoryOwner: String, repositoryName: String): GithubRepoEntity? = withContext(coroutineContext) {
+    private suspend fun loadRepository(repositoryOwner: String, repositoryName: String): GithubRepoEntity? = withContext(coroutineContext) {
         var repository: GithubRepoEntity? = null
         withContext(Dispatchers.IO){
             val response = RetrofitUtil.githubApiService.getRepository(
@@ -119,10 +119,10 @@ class RepositoryActivity: AppCompatActivity(), CoroutineScope {
         }))
     }
 
-    private fun likeRepository(githubRepoEntity: GithubRepoEntity, islike: Boolean) = launch {
+    private fun likeRepository(githubRepoEntity: GithubRepoEntity, isLike: Boolean) = launch {
         withContext(Dispatchers.IO){
             val dao = DataBaseProvider.provideDB(this@RepositoryActivity).searchHistoryDao()
-            if (islike){
+            if (isLike){
                 dao.remove(githubRepoEntity.fullName)
             } else {
                 dao.insert(githubRepoEntity)

@@ -1,7 +1,7 @@
 package com.example.a20_github.data.database
 
+import android.content.Context
 import androidx.room.Room
-import androidx.room.processor.Context
 
 object DataBaseProvider {
 

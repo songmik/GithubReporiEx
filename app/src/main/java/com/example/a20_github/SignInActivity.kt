@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.view.isGone
 import com.example.a20_github.databinding.ActivitySignInBinding
 import com.example.a20_github.utillity.AuthTokenProvider
@@ -35,7 +36,7 @@ class SignInActivity : AppCompatActivity(), CoroutineScope {
         }
     }
 
-    private fun initViews() {
+    private fun initViews() = with(binding) {
         loginButton.setOnClickListener {
             loginGithub()
         }

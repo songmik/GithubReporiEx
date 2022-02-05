@@ -12,6 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.20_github">
+        <activity android:name=".RepositoryActivity"/>
+        <activity android:name=".SearchActivity"/>
+        <activity android:name=".SignInActivity"
+            android:launchMode="singleTask"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

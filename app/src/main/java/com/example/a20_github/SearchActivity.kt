@@ -38,14 +38,14 @@ class SearchActivity : AppCompatActivity(), CoroutineScope {
         adapter = RepositoryRecyclerAdapter()
     }
 
-    private fun initViews() {
+    private fun initViews() = with(binding) {
         emptyResultTextView.isGone = true
         recyclerView.adapter = adapter
     }
 
     private fun bindViews() = with(binding){
         searchButton.setOnClickListener{
-            searchkeyword(searchBarInputView.text.toString())
+            searchKeyword(searchBarInputView.text.toString())
         }
     }
 

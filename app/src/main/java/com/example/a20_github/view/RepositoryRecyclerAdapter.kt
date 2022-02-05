@@ -38,7 +38,7 @@ class RepositoryRecyclerAdapter:RecyclerView.Adapter<RepositoryRecyclerAdapter.R
 
     override fun getItemCount(): Int  = repositoryList.size
 
-    fun setSearchResultList(searchResultList: List<GithubRepoEntity>, searchResultClickListener: (GithubRepoEntity) -> Unit {
+    fun setSearchResultList(searchResultList: List<GithubRepoEntity>, searchResultClickListener: (GithubRepoEntity) -> Unit ){
         this.repositoryList = searchResultList
         this.repositoryClickListener = searchResultClickListener
         notifyDataSetChanged()
